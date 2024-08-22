@@ -31,7 +31,7 @@ The hardware is capable of running remotely due to the Waveshare Pico-UPS-B modu
 - Navigate to `<ip>:5000`, the web page should show the live data from the board now.
 
 ### Todo
-- Add MQTT data interface for more reliable data communication. This will also allow the data to be available directly in TwinCAT.
+- Add MQTT data interface for more reliable data communication. This will also allow the data to be available directly in an external system.
 - Expand web interface to allow start and stop of measurements.
 - Expand web interface and code to allow switching measurement ranges.
 
