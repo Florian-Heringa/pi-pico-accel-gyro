@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>XPlanar Accelerometer Data</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #333; color: #fff; }
+    h1 {text-align: center}
+    .hello{ width: 600px; margin: auto; }
+    .data-container { display: flex; justify-content: space-evenly; }
+    .chart-container {display: flex; justify-content: space-evenly; height: 300px; width: 100%; margin: auto}
+    .ups-chart-container {height: 500px; width: 100%; margin: auto}
+    .canvas-container {width: 45%; height: 100%}
+    .ups-canvas-container {width: 100%; height: 100%}
+    #ups-chart {width: inherit; height: inherit; max-width: 800px; max-height: 400px; margin: auto; display: flex;}
+    #charts {display: flex; flex-direction: column; justify-content: space-evenly;}
+  </style>
+</head>
+<body>
+  <h1>XPlanar Accelerometer Data</h1>
+  <div class="data-container">
+      <div id="accel-data"></div>
+      <div id="gyro-data"></div>
+      <div id="ups-data"></div>
+  </div>
+  <div id="charts">
+    <div class="chart-container">
+        <div class="canvas-container"><canvas id="accel-chart" class="gyro-accel-chart"></canvas></div>
+        <div class="canvas-container"><canvas id="gyro-chart" class="gyro-accel-chart"></canvas></div>
+    </div>
+    <div class="ups-chart-container">
+      <div class="ups-canvas-container"><canvas id="ups-chart"></canvas></div>
+    </div>
+  </div>
+  <script>
+    const accelCtx = document.getElementById("accel-chart").getContext('2d');
+    const gyroCtx = document.getElementById("gyro-chart").getContext('2d');
+    const upsCtx = document.getElementById("ups-chart").getContext('2d');
+    
+    const accelDiv = document.getElementById("accel-data");
+    const gyroDiv = document.getElementById("gyro-data");
+    const upsDiv = document.getElementById("ups-data");
+    
+    console.log(accelCtx, gyroCtx, upsCtx, accelDiv, gyroDiv, upsDiv);
+    
+    const accelChart = new Chart(accelCtx, {
+      type: 'line',
+      data: {
+        labels: [],  // Time labels
+        datasets: [{
+          label: 'x-acceleration',
+          backgroundColor: "#50e991",
+          borderColor: "#50e991",
+          data: []
+        },
+        {
+          label: 'y-acceleration',
+          backgroundColor: "#e60049",
+          borderColor: "#e60049",
+          data: []
+        },
+        {
+          label: 'z-acceleration',
+          backgroundColor: "#0bb4ff",
+          borderColor: "#0bb4ff",
+          data: []
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: "Time",
+              color: "#ccc"
+            },
+            grid: {
+              color: "#444"
+            },
+            ticks: {
+              color: "#ccc"
+            }
+          },
+          y: {
+            type: "linear",
+            title: {
+              display: true,
+              text: "Acceleration (g)",
+              color: "#ccc"
+            },
+            grid: {
+              color: "#444"
+            },
+            ticks: {
+              color: "#ccc"
+            }
+          }
+        }
+      }
+    });
+    
+    const gyroChart = new Chart(gyroCtx, {
+      type: 'line',
+      data: {
+        labels: [],  // Time labels
+        datasets: [{
+          label: 'x-gyro',
+          backgroundColor: "#50e991",
+          borderColor: "#50e991",
+          data: []
+        },
+        {
+          label: 'y-gyro',
+          backgroundColor: "#e60049",
+          borderColor: "#e60049",
+          data: []
+        },
+        {
+          label: 'z-gyro',
+          backgroundColor: "#0bb4ff",
+          borderColor: "#0bb4ff",
+          data: []
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: "Time",
+              color: "#ccc"
+            },
+            grid: {
+              color: "#444"
+            },
+            ticks: {
+              color: "#ccc"
+            }
+          },
+          y: {
+            type: "linear",
+            title: {
+              display: true,
+              text: "Rotation (deg/s)",
+              color: "#ccc"
+            },
+            grid: {
+              color: "#444"
+            },
+            ticks: {
+              color: "#ccc"
+            }
+          }
+        }
+      }
+    });
+    
+    const upsChart = new Chart(upsCtx, {
+      type: 'line',
+      data: {
+        labels: [],  // Time labels
+        datasets: [{
+          label: 'Voltage (V)',
+          backgroundColor: "#50e991",
+          borderColor: "#50e991",
+          data: []
+        },
+        {
+          label: 'Current (mA)',
+          backgroundColor: "#e60049",
+          borderColor: "#e60049",
+          data: []
+        },
+        {
+          label: 'Battery (%)',
+          backgroundColor: "#0bb4ff",
+          borderColor: "#0bb4ff",
+          data: []
+        }]
+      },
+      options: {
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: "Time",
+              color: "#ccc"
+            },
+            grid: {
+              color: "#444"
+            },
+            ticks: {
+              color: "#ccc"
+            }
+          },
+          y: {
+            type: "linear",
+            min: 0,
+            max: 100,
+            grid: {
+              color: "#444"
+            },
+            ticks: {
+              color: "#ccc"
+            }
+          }
+        }
+      }
+    });
+
+    const maxDataPoints = 50;
+      
+    var socket = new WebSocket('ws://' + location.host + '/gyro_data');
+    socket.onmessage = function(event) {
+      const data_json = JSON.parse(event.data);
+      
+      const currentTime = new Date().toLocaleTimeString();
+    
+      accelDiv.innerText = `x: ${data_json.accel.x}\ny: ${data_json.accel.y}\nz: ${data_json.accel.z}`;
+      gyroDiv.innerText = `x: ${data_json.gyro.x}\ny: ${data_json.gyro.y}\nz: ${data_json.gyro.z}`;
+      upsDiv.innerText = `Voltage:${data_json.bus_voltage}\nCurrent: ${data_json.current}\nBattery: ${data_json.p}`;
+
+      // Set canvasses to actual size after rescale
+      const accelCanvas = document.getElementById("accel-chart");
+      const {w, h} = accelCanvas.getBoundingClientRect();
+      accelCanvas.clientWidth = w;
+      accelCanvas.clientHeight = h;
+      
+      accelChart.data.labels.push(currentTime);
+      accelChart.data.datasets[0].data.push(data_json.accel.x);
+      accelChart.data.datasets[1].data.push(data_json.accel.y);
+      accelChart.data.datasets[2].data.push(data_json.accel.z);
+      if (accelChart.data.labels.length > maxDataPoints) {
+          accelChart.data.labels.shift();
+          accelChart.data.datasets[0].data = accelChart.data.datasets[0].data.slice(1, maxDataPoints);
+          accelChart.data.datasets[1].data = accelChart.data.datasets[1].data.slice(1, maxDataPoints);
+          accelChart.data.datasets[2].data = accelChart.data.datasets[2].data.slice(1, maxDataPoints);
+      }
+      accelChart.options.scales.y = {min: -data_json.accel_range, max: data_json.accel_range};
+      accelChart.update();
+      
+      gyroChart.data.labels.push(currentTime);
+      gyroChart.data.datasets[0].data.push(data_json.gyro.x);
+      gyroChart.data.datasets[1].data.push(data_json.gyro.y);
+      gyroChart.data.datasets[2].data.push(data_json.gyro.z);
+      if (gyroChart.data.labels.length > maxDataPoints) {
+          gyroChart.data.labels.shift();
+          gyroChart.data.datasets[0].data = gyroChart.data.datasets[0].data.slice(1, maxDataPoints);
+          gyroChart.data.datasets[1].data = gyroChart.data.datasets[1].data.slice(1, maxDataPoints);
+          gyroChart.data.datasets[2].data = gyroChart.data.datasets[2].data.slice(1, maxDataPoints);
+      }
+      gyroChart.options.scales.y = {min: -data_json.gyro_range, max: data_json.gyro_range};
+      gyroChart.update();
+      
+      upsChart.data.labels.push(currentTime);
+      upsChart.data.datasets[0].data.push(data_json.bus_voltage);
+      upsChart.data.datasets[1].data.push(data_json.current);
+      upsChart.data.datasets[2].data.push(data_json.p);
+      if (upsChart.data.labels.length > maxDataPoints) {
+          upsChart.data.labels.shift();
+          upsChart.data.datasets[0].data = upsChart.data.datasets[0].data.slice(1, maxDataPoints);
+          upsChart.data.datasets[1].data = upsChart.data.datasets[1].data.slice(1, maxDataPoints);
+          upsChart.data.datasets[2].data = upsChart.data.datasets[2].data.slice(1, maxDataPoints);
+      }
+      upsChart.update();
+    };
+  </script>
+</body>
+</html>
