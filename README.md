@@ -1,6 +1,6 @@
 ## Raspberry pi pico standalone aceceleration and gyro measurement
 
-A simple setup that allows remote measurements of gyroscopic and acceleration values. The pico connects to teh Beckhoff Guest network and starts streaming data over websockets when the page is opened. The ip-address of the pico must be found (for example with `arp -a`). And then the page is accessible via `<ip-address>:5000`
+A simple setup that allows remote measurements of gyroscopic and acceleration values. The pico connects to a network and starts streaming data over websockets when the page is opened. The ip-address of the pico must be found (for example with `arp -a`). And then the page is accessible via `<ip-address>:5000`
 
 ![](images/240821-page.png)
 
@@ -31,7 +31,7 @@ The hardware is capable of running remotely due to the Waveshare Pico-UPS-B modu
 - Navigate to `<ip>:5000`, the web page should show the live data from the board now.
 
 ### Todo
-- Add MQTT data interface for more reliable data communication. This will also allow the data to be available directly in TwinCAT.
+- Add MQTT data interface for more reliable data communication. This will also allow the data to be available directly in an external system.
 - Expand web interface to allow start and stop of measurements.
 - Expand web interface and code to allow switching measurement ranges.
 
