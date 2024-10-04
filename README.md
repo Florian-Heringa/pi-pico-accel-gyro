@@ -50,3 +50,4 @@ The hardware is capable of running remotely due to the Waveshare Pico-UPS-B modu
 - https://wokwi.com/projects/373176470515238913
 - https://timhanewich.medium.com/how-to-use-an-mpu-6050-with-a-raspberry-pi-pico-using-micropython-cd768ea9268d
 - https://core-electronics.com.au/guides/getting-started-with-mqtt-on-raspberry-pi-pico-w-connect-to-the-internet-of-things/
+- https://projecthub.arduino.cc/Nicholas_N/how-to-use-the-accelerometer-gyroscope-gy-521-647e65
